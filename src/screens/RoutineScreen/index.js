@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import MenuView from './components/MenuView';
 import ClusterView from './components/ClusterView';
+import MQTTConnection from './components/MQTTConnection';
 
 const styles = StyleSheet.create({
     container: {
@@ -77,6 +78,7 @@ class RoutineScreen extends React.Component {
                     onEditCluster={this.handleEditCluster}
                     onDeleteCluster={this.handleDeleteCluster}
                 />
+                <MQTTConnection />
             </View>
         );
     }
