@@ -27,9 +27,14 @@ const styles = StyleSheet.create({
 
 class MenuView extends React.Component {
     render() {
+        const totalRoutineTime = this.props.clusters.reduce((sum, cluster) => {
+            return isNaN(cluster.duration) ? sum : sum + parseInt(cluster.duration);
+        }, 0);
+
         return (
             <ScrollView style={{ ...this.props.style, ...styles.scrollView }} contentContainerStyle={{ flexGrow: 1 }}>
                 <SafeAreaView style={{ flex: 1 }}>
+                    <Text>Routine start time: {totalRoutineTime ? `22:${60 - totalRoutineTime}` : '23:00'}</Text>
                     <View style={styles.container}>
                         {this.props.clusters.map((cluster, index) =>
                             <Cluster 
@@ -40,6 +45,7 @@ class MenuView extends React.Component {
                                 key={index} />
                         )}
                     </View>
+                    <Text>Sleeptime: 23:00</Text>
                     <View style={styles.button}>
                         <Button 
                             title="Add" 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, AsyncStorage } from 'react-native';
 import MenuView from './components/MenuView';
 import ClusterView from './components/ClusterView';
 import MQTTConnection from './components/MQTTConnection';
@@ -25,11 +25,28 @@ const emptyCluster = {
 
 class RoutineScreen extends React.Component {
     state = {
-        clusters: [
-            emptyCluster,
-        ],
+        clusters: [],
         currentCluster: 0,
     };
+    
+    componentDidMount() {
+        AsyncStorage.getItem('clusters')
+            .then(data => {
+                console.log('DATALOADED', data);
+                if (data === null) {
+                    throw new Error('No Data Saved');
+                }
+                const clusters = JSON.parse(data);
+                this.setState({ clusters });
+            })
+            .catch(err => {
+                this.setState({ clusters: [ emptyCluster ] });
+            });
+    }
+
+    componentDidUpdate() {
+        AsyncStorage.setItem('clusters', JSON.stringify(this.state.clusters));
+    }
 
     // Change the current cluster index
     handleChangeCluster = index => this.setState({ currentCluster: index });

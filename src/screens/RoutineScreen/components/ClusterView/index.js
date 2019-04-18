@@ -1,5 +1,15 @@
 import React from 'react';
-import { SafeAreaView, Text, TextInput, View, StyleSheet, Button, TouchableOpacity, ScrollView } from 'react-native';
+import {
+    SafeAreaView,
+    Text,
+    TextInput,
+    View,
+    StyleSheet,
+    Button,
+    TouchableOpacity,
+    ScrollView,
+    Picker
+} from 'react-native';
 
 const styles = StyleSheet.create({
     inputContainer: {
@@ -85,6 +95,10 @@ class ClusterView extends React.Component {
     }
 
     render() {
+        if (!this.props.cluster) {
+            return null;
+        }
+        
         return (
             <ScrollView>
                 <SafeAreaView style={{ flex: 1 }}>
