@@ -8,6 +8,8 @@ import {
     Button 
 } from 'react-native';
 import Cluster from './components/Cluster';
+import SleepTime from './components/SleepTime';
+import getTime from '../../../../helpers/getTime';
 
 const styles = StyleSheet.create({
     container: {
@@ -22,6 +24,11 @@ const styles = StyleSheet.create({
     button: {
         flex: 1,
         justifyContent: 'flex-end'
+    },
+    text: {
+        color: '#666',
+        textAlign: 'center',
+        marginTop: 15,
     }
 });
 
@@ -31,11 +38,13 @@ class MenuView extends React.Component {
             return isNaN(cluster.duration) ? sum : sum + parseInt(cluster.duration);
         }, 0);
 
+        const routineStartTime = new Date(this.props.sleepTime - totalRoutineTime * 1000);
+
         return (
             <ScrollView style={{ ...this.props.style, ...styles.scrollView }} contentContainerStyle={{ flexGrow: 1 }}>
                 <SafeAreaView style={{ flex: 1 }}>
-                    <Text>Routine start time: {totalRoutineTime ? `22:${60 - totalRoutineTime}` : '23:00'}</Text>
                     <View style={styles.container}>
+                        <Text style={styles.text}>{getTime(routineStartTime)}</Text>
                         {this.props.clusters.map((cluster, index) =>
                             <Cluster 
                                 cluster={cluster} 
@@ -44,8 +53,11 @@ class MenuView extends React.Component {
                                 onPress={this.props.onChangeCluster}
                                 key={index} />
                         )}
+                        <SleepTime 
+                            sleepTime={this.props.sleepTime} 
+                            onChangeSleepTime={this.props.onChangeSleepTime}
+                            />
                     </View>
-                    <Text>Sleeptime: 23:00</Text>
                     <View style={styles.button}>
                         <Button 
                             title="Add" 

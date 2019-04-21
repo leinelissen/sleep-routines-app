@@ -21,18 +21,22 @@ const emptyCluster = {
     location: undefined,
     activities: [ ],
     duration: undefined,
+    shouldUpdate: false,
+    lastUpdated: null,
 }
+
+AsyncStorage.clear();
 
 class RoutineScreen extends React.Component {
     state = {
         clusters: [],
         currentCluster: 0,
+        sleepTime: new Date("2019-03-11T23:00:00+01:00"),
     };
     
     componentDidMount() {
         AsyncStorage.getItem('clusters')
             .then(data => {
-                console.log('DATALOADED', data);
                 if (data === null) {
                     throw new Error('No Data Saved');
                 }
@@ -54,9 +58,8 @@ class RoutineScreen extends React.Component {
 
     // Replace the current cluster with new data
     handleEditCluster = cluster => {
-        const clusters = this.state.clusters;
+        const clusters = [...this.state.clusters];
         clusters[this.state.currentCluster] = cluster;
-
         this.setState({ clusters });
     }
 
@@ -80,22 +83,24 @@ class RoutineScreen extends React.Component {
         });
     };
 
+    handleChangeSleepTime = sleepTime => this.setState({ sleepTime });
+
     render() {
         return (
             <View style={styles.container}>
                 <MenuView 
                     style={styles.menu} 
-                    clusters={this.state.clusters} 
-                    currentCluster={this.state.currentCluster}
                     onChangeCluster={this.handleChangeCluster}
                     onAddCluster={this.handleAddCluster} 
+                    onChangeSleepTime={this.handleChangeSleepTime}
+                    {...this.state}
                 />
                 <ClusterView
                     cluster={this.state.clusters[this.state.currentCluster]}
                     onEditCluster={this.handleEditCluster}
                     onDeleteCluster={this.handleDeleteCluster}
                 />
-                <MQTTConnection />
+                <MQTTConnection clusters={this.state.clusters} />
             </View>
         );
     }
