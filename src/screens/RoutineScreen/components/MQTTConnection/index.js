@@ -1,13 +1,7 @@
 import React from 'react';
 import Paho from 'paho-mqtt';
-import { Constants } from 'expo';
+import { Constants, Notifications } from 'expo';
 import { MQTT_HOST, MQTT_USER, MQTT_PASSWORD } from 'react-native-dotenv'
-
-const connectMessage = {
-    event: 'deviceConnected',
-    deviceType: 'app',
-    deviceUuid: Constants.installationId,
-};
 
 class MQTTConnection extends React.Component {
     client = null;
@@ -69,13 +63,21 @@ class MQTTConnection extends React.Component {
     /**
      * Handle a successful connection to the MQTT Broker
      */
-    handleConnect = () => {
+    handleConnect = async () => {
         // Log connection and set correct flag
         console.log('Succesfully connected to MQTT broker!');
         this.isConnected = true;
         
         // Subscribe to the relevant channels
         this.client.subscribe('/sleep-routines');
+
+        // Construct message
+        const connectMessage = {
+            event: 'deviceConnected',
+            deviceType: 'app',
+            deviceUuid: Constants.installationId,
+            pushToken: await Notifications.getExpoPushTokenAsync(),
+        };
 
         // Send a connection message
         const message = new Paho.Message(JSON.stringify(connectMessage));
