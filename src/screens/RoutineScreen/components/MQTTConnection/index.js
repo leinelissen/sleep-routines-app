@@ -57,6 +57,8 @@ class MQTTConnection extends React.Component {
 
         const message = new Paho.Message(JSON.stringify(data));
         message.destinationName = '/sleep-routines';
+        message.qos = 1;
+        message.retained = true;
         this.client.send(message);
     }
 
