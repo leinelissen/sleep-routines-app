@@ -12,7 +12,7 @@ class MQTTConnection extends React.Component {
 
         this.client = new Paho.Client(MQTT_HOST, 'app');
         this.client.onConnectionLost = this.handleDisconnect;
-        this.client.onMessageDelivered = this.handleMessage;
+        this.client.onMessageArrived = this.handleMessage;
     }
 
     componentDidMount() {
@@ -20,7 +20,7 @@ class MQTTConnection extends React.Component {
             userName: MQTT_USER,
             password: MQTT_PASSWORD,
             onSuccess: this.handleConnect,
-            onFailure: (error) => console.log('CONNECT FAILED', error),
+            onFailure: (error) => console.error('CONNECT FAILED', error),
         });
     }
 
@@ -69,7 +69,9 @@ class MQTTConnection extends React.Component {
         this.isConnected = true;
         
         // Subscribe to the relevant channels
-        this.client.subscribe('/sleep-routines');
+        this.client.subscribe('/sleep-routines', {
+            qos: 1,
+        });
 
         // Construct message
         const connectMessage = {
@@ -93,9 +95,19 @@ class MQTTConnection extends React.Component {
      *
      * @param {*} message
      */
-    handleMessage(message) {
+    handleMessage = (data) => {
+        // Parse incoming JSON
+        const message = JSON.parse(data.payloadString);
+
+        // Log message
         console.log('RECEIVED MESSAGE');
-        console.log(message.payloadString);
+        console.log(message);
+
+        if (message.event === 'updateIntervalAcknowledge') {
+            // When an update has been received by a sombrero, pass a completion
+            // handler. 
+            this.props.onClusterCompletedUpdate(message.sombreroId);
+        }
     }
 
     render() {

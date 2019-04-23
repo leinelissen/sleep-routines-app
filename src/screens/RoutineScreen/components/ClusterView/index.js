@@ -9,8 +9,9 @@ import {
     TouchableOpacity,
     ScrollView,
     Picker,
-    ActivityIndicator
+    ActivityIndicator,
 } from 'react-native';
+import { distanceInWordsToNow } from 'date-fns';
 
 const styles = StyleSheet.create({
     inputContainer: {
@@ -62,6 +63,22 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         color: 'white',
         marginLeft: 10,
+    },
+    textCenter: {
+        flex: 1,
+        alignItems: 'center',
+        marginBottom: 15,
+    },
+    pickerOverlay: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        left: 0,
+        top: 0,
+        zIndex: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.8)'
     }
 })
 
@@ -140,30 +157,34 @@ class ClusterView extends React.Component {
                         )}
                         <Button title="+" color="#4cd964" onPress={this.onCreateNewActivity} />
                     </View>
-                    <View style={styles.inputContainer}>
-                        {/* <TextInput 
-                            style={styles.input}
-                            value={this.props.cluster.duration} 
-                            onChangeText={this.onChangeDuration}
-                            keyboardType="number-pad"
-                            placeholder="Duration (minutes)"
-                            multiline={false}
-                        /> */}
+                    <View style={{ ...styles.inputContainer, position: 'relative'}}>
+                        <View 
+                            style={{ 
+                                ...styles.pickerOverlay, 
+                                display: this.props.cluster.shouldUpdate ? 'flex' : 'none'
+                            }}
+                        >
+                            <ActivityIndicator />
+                        </View>
                         <Text style={styles.arrayTitle}>DURATION</Text>
                         <Picker 
                             selectedValue={this.props.cluster.duration}
                             onValueChange={this.onChangeDuration}
-                            enabled={false}
                         >
                             {[...new Array(30)].map((n, i) => 
                                 <Picker.Item 
                                     label={`${i + 1}${i >= 1 ? ' minutes' : ' minute'}`} 
-                                    value={(i+1)*60}
+                                    value={(i+1)*60*1000}
                                     key={i} />    
                             )}
                         </Picker>
                     </View>
-                    { this.props.cluster.shouldUpdate && <ActivityIndicator /> }
+                    <View style={styles.textCenter}>
+                        <Text style={{color: '#ccc'}}>Last updated: {this.props.cluster.lastUpdated 
+                            ? distanceInWordsToNow(this.props.cluster.lastUpdated, { includeSeconds: true })
+                            : 'Never'
+                        }</Text>
+                    </View>
                     <Button title="Delete" color="#ff3b30" onPress={this.props.onDeleteCluster} />
                 </SafeAreaView>      
             </ScrollView>

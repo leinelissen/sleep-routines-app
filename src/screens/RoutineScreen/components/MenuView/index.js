@@ -38,7 +38,7 @@ class MenuView extends React.Component {
             return isNaN(cluster.duration) ? sum : sum + parseInt(cluster.duration);
         }, 0);
 
-        const routineStartTime = new Date(this.props.sleepTime - totalRoutineTime * 1000);
+        const routineStartTime = new Date(this.props.sleepTime - totalRoutineTime);
 
         return (
             <ScrollView style={{ ...this.props.style, ...styles.scrollView }} contentContainerStyle={{ flexGrow: 1 }}>

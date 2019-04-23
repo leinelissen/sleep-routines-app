@@ -40,13 +40,13 @@ class RoutineScreen extends React.Component {
     };
     
     componentDidMount() {
-        AsyncStorage.getItem('clusters')
+        AsyncStorage.getItem('state')
             .then(data => {
                 if (data === null) {
                     throw new Error('No Data Saved');
                 }
                 const clusters = JSON.parse(data);
-                this.setState({ clusters });
+                this.setState(data);
             })
             .catch(err => {
                 this.setState({ clusters: [ emptyCluster ] });
@@ -57,7 +57,7 @@ class RoutineScreen extends React.Component {
     }
 
     componentDidUpdate() {
-        AsyncStorage.setItem('clusters', JSON.stringify(this.state.clusters));
+        AsyncStorage.setItem('state', JSON.stringify(this.state));
     }
 
     registerPushNotifications() {
@@ -140,6 +140,16 @@ class RoutineScreen extends React.Component {
             .catch(console.error);
     }
 
+    // Update a cluster with a particular index when its updating mechanic has
+    // completed.
+    handleClusterCompletedUpdate = index => {
+        const clusters = [ ...this.state.clusters ];
+        clusters[index].shouldUpdate = false;
+        clusters[index].lastUpdated = new Date();
+
+        this.setState({ clusters });
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -155,7 +165,10 @@ class RoutineScreen extends React.Component {
                     onEditCluster={this.handleEditCluster}
                     onDeleteCluster={this.handleDeleteCluster}
                 />
-                <MQTTConnection clusters={this.state.clusters} />
+                <MQTTConnection 
+                    clusters={this.state.clusters} 
+                    onClusterCompletedUpdate={this.handleClusterCompletedUpdate}
+                />
             </View>
         );
     }
