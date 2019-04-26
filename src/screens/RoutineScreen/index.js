@@ -30,8 +30,6 @@ const emptyCluster = {
     lastUpdated: null,
 }
 
-// AsyncStorage.clear();
-
 class RoutineScreen extends React.Component {
     state = {
         clusters: [],
@@ -105,34 +103,49 @@ class RoutineScreen extends React.Component {
         this.setState({ sleepTime });
 
         // Calculate notification time
-        const notificationTime = subMinutes(
-            setDayOfYear(sleepTime, 
-                getDayOfYear(new Date())),
-            15
-        );
+        const actualisedSleepTime = setDayOfYear(sleepTime, getDayOfYear(new Date()));
 
         // Check if the notification time is in the future, if not add a day
-        if (!isFuture(notificationTime)) {
-            notificationTime = addDays(notificationTime, 1);
+        if (!isFuture(actualisedSleepTime)) {
+            actualisedSleepTime = addDays(notificationTime, 1);
         }
 
         // Cancel any scheduled notifications
         return Notifications.cancelAllScheduledNotificationsAsync()
             // Create an array with notifications for the coming days
-            .then(() => [...new Array(AMOUNT_OF_NOTIFICATIONS_PLANNED)]
-                .map((x, i) => addDays(notificationTime, i))
-            )
+            .then(() => {
+                // The first prompt tells users to relax
+                const preSleepTime = subMinutes(actualisedSleepTime, 90);
+                const preSleepNotifications = [...new Array(AMOUNT_OF_NOTIFICATIONS_PLANNED)]
+                    .map((x, i) => ({
+                        time: addDays(preSleepTime, i),
+                        text: `Take your time to relax ☕️. Your bedtime routine starts in 90 minutes...`
+                    }));
+
+                // The second prompt asks them to start their routines
+                const routineTime = subMinutes(actualisedSleepTime, 30);
+                const routineNotifcations = [...new Array(AMOUNT_OF_NOTIFICATIONS_PLANNED)]
+                    .map((x, i) => ({
+                        time: addDays(routineTime, i),
+                        text: `It's time for bed 🛌. Start your routine in the next 30 minutes...`
+                    }));
+        
+                return [
+                    ...preSleepNotifications,
+                    ...routineNotifcations,
+                ]
+            })
             // Schedule all notifications
             .then(notifications => Promise.all(
-                notifications.map(notification => 
+                notifications.map(({ text, time }) => 
                     Notifications.scheduleLocalNotificationAsync({
                         title: 'Sleep Routines',
-                        body: 'Go to bed...',
+                        body: text,
                         ios: {
                             sound: true,
                         }
                     }, {
-                        time: notification
+                        time: time
                     })
                 )
             ))
