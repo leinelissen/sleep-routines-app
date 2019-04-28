@@ -80,7 +80,7 @@ class MQTTConnection extends React.Component {
             event: 'deviceConnected',
             deviceType: 'app',
             deviceUuid: Constants.installationId,
-            pushToken: await Notifications.getExpoPushTokenAsync(),
+            pushToken: Constants.isDevice ? await Notifications.getExpoPushTokenAsync() : undefined,
         };
 
         // Send a connection message

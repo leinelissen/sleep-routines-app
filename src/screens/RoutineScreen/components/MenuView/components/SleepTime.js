@@ -10,7 +10,7 @@ import {
     View,
     SafeAreaView
 } from 'react-native';
-import getTime from '../../../../../helpers/getTime';
+import { format } from 'date-fns';
 
 const styles = {
     modal: {
@@ -40,7 +40,7 @@ class SleepTime extends Component {
         return (
             <View>
                 <Button 
-                    title={getTime(this.props.sleepTime)} 
+                    title={format(this.props.sleepTime, 'HH:mm')} 
                     onPress={this.openModal} 
                 />
                 <Modal visible={this.state.modalIsOpen} animationType="slide">

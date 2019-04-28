@@ -7,9 +7,9 @@ import {
     SafeAreaView, 
     Button 
 } from 'react-native';
+import { format } from 'date-fns';
 import Cluster from './components/Cluster';
 import SleepTime from './components/SleepTime';
-import getTime from '../../../../helpers/getTime';
 
 const styles = StyleSheet.create({
     container: {
@@ -34,17 +34,19 @@ const styles = StyleSheet.create({
 
 class MenuView extends React.Component {
     render() {
+        const sleepTime = new Date(this.props.sleepTime);
+
         const totalRoutineTime = this.props.clusters.reduce((sum, cluster) => {
             return isNaN(cluster.duration) ? sum : sum + parseInt(cluster.duration);
         }, 0);
 
-        const routineStartTime = new Date(this.props.sleepTime - totalRoutineTime);
+        const routineStartTime = new Date(sleepTime - totalRoutineTime);
 
         return (
             <ScrollView style={{ ...this.props.style, ...styles.scrollView }} contentContainerStyle={{ flexGrow: 1 }}>
                 <SafeAreaView style={{ flex: 1 }}>
                     <View style={styles.container}>
-                        <Text style={styles.text}>{getTime(routineStartTime)}</Text>
+                        <Text style={styles.text}>{format(routineStartTime, 'HH:mm')}</Text>
                         {this.props.clusters.map((cluster, index) =>
                             <Cluster 
                                 cluster={cluster} 
@@ -54,7 +56,7 @@ class MenuView extends React.Component {
                                 key={index} />
                         )}
                         <SleepTime 
-                            sleepTime={this.props.sleepTime} 
+                            sleepTime={sleepTime} 
                             onChangeSleepTime={this.props.onChangeSleepTime}
                             />
                     </View>

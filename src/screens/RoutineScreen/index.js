@@ -25,7 +25,7 @@ const emptyCluster = {
     title: undefined,
     location: undefined,
     activities: [ ],
-    duration: undefined,
+    duration: 60000,
     shouldUpdate: false,
     lastUpdated: null,
 }
@@ -34,7 +34,7 @@ class RoutineScreen extends React.Component {
     state = {
         clusters: [],
         currentCluster: 0,
-        sleepTime: new Date("2019-03-11T23:00:00+01:00"),
+        sleepTime: "2019-03-11T23:00:00+01:00",
     };
     
     componentDidMount() {
@@ -43,10 +43,12 @@ class RoutineScreen extends React.Component {
                 if (data === null) {
                     throw new Error('No Data Saved');
                 }
-                const clusters = JSON.parse(data);
-                this.setState(data);
+                const state = JSON.parse(data);
+                this.setState(state);
             })
             .catch(err => {
+                console.log('Error while retrieving state from AsyncStorage, setting empty state.')
+                console.log(err);
                 this.setState({ clusters: [ emptyCluster ] });
             });
 
@@ -55,20 +57,23 @@ class RoutineScreen extends React.Component {
     }
 
     componentDidUpdate() {
-        AsyncStorage.setItem('state', JSON.stringify(this.state));
+        AsyncStorage.setItem('state', JSON.stringify(this.state))
+            .catch(console.error);
     }
 
     registerPushNotifications() {
-        return Constants.isDevice ? Permissions.askAsync(
-            Permissions.NOTIFICATIONS,
-            Permissions.USER_FACING_NOTIFICATIONS,
-        ).then(() => Notifications.getExpoPushTokenAsync())
-            : new Promise.resolve();
+        if (Constants.isDevice) {
+            return Permissions.askAsync(
+                Permissions.NOTIFICATIONS,
+                Permissions.USER_FACING_NOTIFICATIONS,
+            ).then(() => Notifications.getExpoPushTokenAsync());
+        }
+        
+        return new Promise.resolve();
     }
 
     // Change the current cluster index
     handleChangeCluster = index => this.setState({ currentCluster: index });
-
 
     // Replace the current cluster with new data
     handleEditCluster = cluster => {
@@ -100,7 +105,7 @@ class RoutineScreen extends React.Component {
     // Change the current sleep time
     handleChangeSleepTime = sleepTime => {
         // Write new time to state
-        this.setState({ sleepTime });
+        this.setState({ sleepTime: sleepTime.toString() });
 
         // Calculate notification time
         const actualisedSleepTime = setDayOfYear(sleepTime, getDayOfYear(new Date()));
@@ -158,7 +163,7 @@ class RoutineScreen extends React.Component {
     handleClusterCompletedUpdate = index => {
         const clusters = [ ...this.state.clusters ];
         clusters[index].shouldUpdate = false;
-        clusters[index].lastUpdated = new Date();
+        clusters[index].lastUpdated = new Date().toString();
 
         this.setState({ clusters });
     }
