@@ -1,6 +1,26 @@
 import React from 'react';
 import { SafeAreaView, ScrollView, Text, StyleSheet } from 'react-native';
 
+/**
+ * This screen will display help info
+ *
+ * @class HelpScreen
+ * @extends {React.Component}
+ */
+class HelpScreen extends React.Component {
+    render() {
+        return (
+            <SafeAreaView>
+                <ScrollView style={styles.container}>
+                    <Heading>Help!</Heading>
+                    <Paragraph>We trust you can figure out how to work with our stuffs. When in dire need, contact Axel.</Paragraph>
+                </ScrollView>
+            </SafeAreaView>
+        );
+    }
+}
+
+// These contain all styles
 const styles = StyleSheet.create({
     container: {
         padding: 25,
@@ -17,20 +37,8 @@ const styles = StyleSheet.create({
     }
 });
 
+// We'll create some helpers elements, so that it is easier to write text
 const Heading = ({ children }) => <Text style={styles.title}>{children}</Text>;
 const Paragraph = ({ children }) => <Text style={styles.paragraph}>{children}</Text>;
-
-class HelpScreen extends React.Component {
-    render() {
-        return (
-            <SafeAreaView>
-                <ScrollView style={styles.container}>
-                    <Heading>Help!</Heading>
-                    <Paragraph>We trust you can figure out how to work with our stuffs. When in dire need, contact Axel.</Paragraph>
-                </ScrollView>
-            </SafeAreaView>
-        );
-    }
-}
 
 export default HelpScreen;

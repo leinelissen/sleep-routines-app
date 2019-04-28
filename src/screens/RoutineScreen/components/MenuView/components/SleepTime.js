@@ -1,10 +1,7 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
-    Picker,
     Modal,
     Text,
-    TouchableOpacity,
-    StyleSheet,
     Button,
     DatePickerIOS,
     View,
@@ -12,28 +9,35 @@ import {
 } from 'react-native';
 import { format } from 'date-fns';
 
-const styles = {
-    modal: {
-        flex: 1,
-        justifyContent: 'center',
-    },
-    text: {
-        textAlign: 'center',
-    },
-    closeButton: {
-        position: 'absolute',
-        top: 10,
-        right: 10,
-    }
-};
-
-class SleepTime extends Component {
+/**
+ * The SleepTime button in the left-hand Menu
+ *
+ * @class SleepTime
+ * @extends {PureComponent}
+ */
+class SleepTime extends PureComponent {
+    /**
+     * The default state for the component
+     *
+     * @memberof SleepTime
+     */
     state = {
+        // The modal is closed by default
         modalIsOpen: false,
     }
 
+    /**
+     * Open the moal
+     *
+     * @memberof SleepTime
+     */
     openModal = () => this.setState({ modalIsOpen: true });
 
+    /**
+     * Close the modal
+     *
+     * @memberof SleepTime
+     */
     closeModal = () => this.setState({ modalIsOpen: false });
 
     render() {
@@ -61,5 +65,21 @@ class SleepTime extends Component {
         );
     }
 }
+
+// The stylesheet
+const styles = {
+    modal: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    text: {
+        textAlign: 'center',
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+    }
+};
 
 export default SleepTime;
