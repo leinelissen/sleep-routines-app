@@ -13,13 +13,13 @@ const AMOUNT_OF_NOTIFICATIONS_PLANNED = 15;
  * @param {*} sleepTime
  * @returns Promise
  */
-function scheduleNotifications(sleepTime) {
+function scheduleNotifications(routineStartTime) {
     // Calculate notification time
-    const actualisedSleepTime = setDayOfYear(sleepTime, getDayOfYear(new Date()));
+    const actualisedRoutineStartTime = setDayOfYear(routineStartTime, getDayOfYear(new Date()));
 
     // Check if the notification time is in the future, if not add a day
-    if (!isFuture(actualisedSleepTime)) {
-        actualisedSleepTime = addDays(notificationTime, 1);
+    if (!isFuture(actualisedRoutineStartTime)) {
+        actualisedRoutineStartTime = addDays(notificationTime, 1);
     }
 
     // Cancel any scheduled notifications
@@ -27,7 +27,7 @@ function scheduleNotifications(sleepTime) {
         // Create an array with notifications for the coming days
         .then(() => {
             // The first prompt tells users to relax
-            const preSleepTime = subMinutes(actualisedSleepTime, 90);
+            const preSleepTime = subMinutes(actualisedRoutineStartTime, 90);
             const preSleepNotifications = [...new Array(AMOUNT_OF_NOTIFICATIONS_PLANNED)]
                 .map((x, i) => ({
                     time: addDays(preSleepTime, i),
@@ -35,7 +35,7 @@ function scheduleNotifications(sleepTime) {
                 }));
 
             // The second prompt asks them to start their routines
-            const routineTime = subMinutes(actualisedSleepTime, 30);
+            const routineTime = subMinutes(actualisedRoutineStartTime, 30);
             const routineNotifcations = [...new Array(AMOUNT_OF_NOTIFICATIONS_PLANNED)]
                 .map((x, i) => ({
                     time: addDays(routineTime, i),
