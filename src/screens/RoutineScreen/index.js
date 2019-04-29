@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, AsyncStorage } from 'react-native';
 import { Notifications, Permissions, Constants } from 'expo';
+import { debounce } from 'debounce';
 
 import MenuView from './components/MenuView';
 import ClusterView from './components/ClusterView';
@@ -53,13 +54,36 @@ class RoutineScreen extends React.Component {
     }
 
     /**
-     * Whenever the state data changes, persist the whole state
+     * Whenever the state changes, we need to do some actions
      *
      * @memberof RoutineScreen
      */
     componentDidUpdate() {
+        // Store the new state in AsyncStorage, so we can retrieve it when the
+        // app gets closed and openend again
         AsyncStorage.setItem('state', JSON.stringify(this.state))
             .catch(console.error);
+
+        // Set the scheduled notifications, but wait for 2500 so that we don't
+        // spam notification calls.
+        debounce(this.setScheduledNotifications, 2500);
+    }
+
+    /**
+     * Set the scheduled notifications based on the data provided
+     *
+     * @memberof RoutineScreen
+     */
+    setScheduledNotifications = () => {
+        // In order to schedule notifications we need to caluclate the new
+        // routine start time
+        const routineStartTime = this.state.sleepTime - this.state.clusters.reduce((sum, cluster) => 
+            cluster.duration ? sum + parseInt(cluster.duration) : sum
+        , 0);
+
+        // Also schedule notifications for the new sleepTime
+        scheduleNotifications(routineStartTime)
+            .catch(console.log);
     }
 
     /**
@@ -196,10 +220,6 @@ class RoutineScreen extends React.Component {
     handleChangeSleepTime = sleepTime => {
         // Write new time to state
         this.setState({ sleepTime: sleepTime.toString() });
-
-        // Also schedule notifications for the new sleepTime
-        scheduleNotifications(sleepTime)
-            .catch(console.log);
     }
 
     /**
