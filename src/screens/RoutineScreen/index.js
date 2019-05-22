@@ -40,6 +40,12 @@ class RoutineScreen extends React.Component {
         // This is the default sleep time, set to 23:00, Dutch time
         sleepTime: "2019-03-11T23:00:00+01:00",
     };
+
+    constructor() {
+        super();
+
+        this.debouncedSetScheduledNotifications = debounce(this.setScheduledNotifications, 2500);
+    }
     
     /**
      * Whenever the component is mounted, run these functions
@@ -66,7 +72,7 @@ class RoutineScreen extends React.Component {
 
         // Set the scheduled notifications, but wait for 2500 so that we don't
         // spam notification calls.
-        debounce(this.setScheduledNotifications, 2500);
+        this.debouncedSetScheduledNotifications();
     }
 
     /**
@@ -77,7 +83,7 @@ class RoutineScreen extends React.Component {
     setScheduledNotifications = () => {
         // In order to schedule notifications we need to caluclate the new
         // routine start time
-        const routineStartTime = this.state.sleepTime - this.state.clusters.reduce((sum, cluster) => 
+        const routineStartTime = new Date(this.state.sleepTime).getTime() - this.state.clusters.reduce((sum, cluster) => 
             cluster.duration ? sum + parseInt(cluster.duration) : sum
         , 0);
 

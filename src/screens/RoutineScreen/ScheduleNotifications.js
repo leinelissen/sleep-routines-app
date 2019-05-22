@@ -15,11 +15,11 @@ const AMOUNT_OF_NOTIFICATIONS_PLANNED = 15;
  */
 function scheduleNotifications(routineStartTime) {
     // Calculate notification time
-    const actualisedRoutineStartTime = setDayOfYear(routineStartTime, getDayOfYear(new Date()));
+    var actualisedRoutineStartTime = setDayOfYear(routineStartTime, getDayOfYear(new Date()));
 
     // Check if the notification time is in the future, if not add a day
     if (!isFuture(actualisedRoutineStartTime)) {
-        actualisedRoutineStartTime = addDays(notificationTime, 1);
+        actualisedRoutineStartTime = addDays(actualisedRoutineStartTime, 1);
     }
 
     // Cancel any scheduled notifications
@@ -46,14 +46,14 @@ function scheduleNotifications(routineStartTime) {
             return [
                 ...preSleepNotifications,
                 ...routineNotifcations,
-            ]
+            ];
         })
         // Schedule all notifications
         .then(notifications => Promise.all(
             // Loop through all notifications given
-            notifications.map(({ text, time }) => 
+            notifications.map(({ text, time }) => {
                 // Schedule a single notification
-                Notifications.scheduleLocalNotificationAsync({
+                return Notifications.scheduleLocalNotificationAsync({
                     // Notification heading
                     title: 'Sleep Routines',
                     // Notification text
@@ -62,8 +62,8 @@ function scheduleNotifications(routineStartTime) {
                         sound: true,
                     }
                 }, { time })
-            )
-        ))
+            })
+        ));
 }
 
 export default scheduleNotifications;
